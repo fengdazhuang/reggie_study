@@ -8,18 +8,11 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-
-public class Employee implements Serializable {
-    private static final Long serialVersionUID=1L;
-
+public class Category implements Serializable {
     private Long id;
+    private Integer type;
     private String name;
-    private String username;
-    private String password;
-    private String sex;
-    private String phone;
-    private String idNumber;
-    private Integer status;
+    private Integer sort;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

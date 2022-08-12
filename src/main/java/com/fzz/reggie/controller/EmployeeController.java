@@ -58,8 +58,6 @@ public class EmployeeController {
     public R<String> save(HttpSession session, @RequestBody Employee employee){
         String password = DigestUtils.md5DigestAsHex("123456".getBytes());
         employee.setPassword(password);
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
         Long id = (Long) session.getAttribute("employee");
         employee.setCreateUser(id);
         employee.setUpdateUser(id);
@@ -86,6 +84,15 @@ public class EmployeeController {
         employee.setUpdateUser(empId);
         employeeService.updateById(employee);
         return R.success("修改成功");
+    }
+
+    @GetMapping("/{id}")
+    public R<Employee> getEmployee(@PathVariable("id") Long id){
+        Employee employee = employeeService.getById(id);
+        if(employee!=null){
+            return R.success(employee);
+        }
+        return R.error("用户不存在");
     }
 
 }

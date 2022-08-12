@@ -1,6 +1,7 @@
 package com.fzz.reggie.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.fzz.reggie.common.BaseContext;
 import com.fzz.reggie.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
@@ -24,6 +25,8 @@ public class LoginCheckFilter implements Filter {
 
         String requestURI = request.getRequestURI();
 
+
+
         log.info("已拦截路径："+requestURI);
 
         String[] urls=new String[]{
@@ -36,6 +39,8 @@ public class LoginCheckFilter implements Filter {
         }
 
         if(request.getSession().getAttribute("employee")!=null){
+            Long id= (Long) request.getSession().getAttribute("employee");
+            BaseContext.setCurrent(id);
             filterChain.doFilter(request,response);
             return;
         }
