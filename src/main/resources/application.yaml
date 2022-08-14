@@ -18,3 +18,7 @@ mybatis-plus:
     db-config:
       # 主键生成策略
       id-type: ASSIGN_ID
+
+reggie:
+#  path: D:\img\
+  path: C:\Users\冯大壮\IdeaProjects\reggie_study\imgs\

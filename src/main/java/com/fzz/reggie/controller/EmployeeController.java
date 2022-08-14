@@ -78,10 +78,7 @@ public class EmployeeController {
     }
 
     @PutMapping
-    public R<String> updateStatus(@RequestBody Employee employee,HttpSession session){
-        Long empId= (Long) session.getAttribute("employee");
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(empId);
+    public R<String> updateStatus(@RequestBody Employee employee){
         employeeService.updateById(employee);
         return R.success("修改成功");
     }

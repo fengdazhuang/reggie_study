@@ -98,7 +98,7 @@
               <span
                 v-if="dishFlavors.length == 0"
                 class="addBut"
-                @click="addFlavore"
+                @click="addFlavor"
               > + 添加口味</span>
               <div
                 v-if="dishFlavors.length != 0"
@@ -170,7 +170,7 @@
                 </div>
                 <div
                   class="addBut"
-                  @click="addFlavore"
+                  @click="addFlavor"
                 >
                   添加口味
                 </div>
@@ -351,7 +351,7 @@
             })
           },
           // 按钮 - 添加口味
-          addFlavore () {
+          addFlavor () {
             this.dishFlavors.push({'name': '', 'value': [], showOption: false}) // JSON.parse(JSON.stringify(this.dishFlavorsData))
           },
 
