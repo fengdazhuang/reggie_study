@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fzz.reggie.bean.Dish;
 import com.fzz.reggie.bean.DishFlavor;
 import com.fzz.reggie.dto.DishDto;
-import com.fzz.reggie.mapper.DishFlavorMapper;
 import com.fzz.reggie.mapper.DishMapper;
 import com.fzz.reggie.service.DishFlavorService;
 import com.fzz.reggie.service.DishService;
@@ -14,17 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements DishService {
 
     @Autowired
     private DishFlavorService dishFlavorService;
-    @Autowired
-    private DishFlavorMapper dishFlavorMapper;
 
     @Override
     @Transactional
@@ -37,23 +33,51 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
-    public Dish updateStatus(Long ids) {
-        Dish dish = this.getById(ids);
-        dish.setStatus(dish.getStatus()==0?1:0);
-        this.updateById(dish);
-        return dish;
+    public List<Dish> updateStatus(Long[] ids) {
+        List<Dish> list = this.listByIds(Arrays.asList(ids));
+        for(Dish dish:list){
+            dish.setStatus(dish.getStatus()==0?1:0);
+            this.updateById(dish);
+        }
+
+        return list;
     }
 
     @Override
     public DishDto getWithFlavorById(Long id) {
         Dish dish = this.getById(id);
         DishDto dishDto=new DishDto();
+        BeanUtils.copyProperties(dish,dishDto);
         LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(DishFlavor::getDishId,dish.getId());
-        BeanUtils.copyProperties(dish,dishDto);
-        List<DishFlavor> list=dishFlavorMapper.selectList(queryWrapper);
+        List<DishFlavor> list=dishFlavorService.list(queryWrapper);
         dishDto.setFlavors(list);
         return dishDto;
+    }
+
+    @Override
+    public void updateWithFlavor(DishDto dishDto) {
+        this.updateById(dishDto);
+
+        LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(DishFlavor::getDishId,dishDto.getId());
+        dishFlavorService.remove(queryWrapper);
+        List<DishFlavor> flavors = dishDto.getFlavors();
+        for(DishFlavor flavor:flavors){
+            flavor.setDishId(dishDto.getId());
+        }
+        dishFlavorService.saveBatch(flavors);
+    }
+
+    @Override
+    public void removeWithFlavor(Long[] ids) {
+        List<Long> list = Arrays.asList(ids);
+        for(Long id:list){
+            LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
+            queryWrapper.eq(DishFlavor::getDishId,id);
+            dishFlavorService.remove(queryWrapper);
+        }
+        this.removeByIds(list);
     }
 
 

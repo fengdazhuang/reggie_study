@@ -4,11 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fzz.reggie.bean.Category;
 import com.fzz.reggie.bean.Dish;
-import com.fzz.reggie.bean.DishFlavor;
 import com.fzz.reggie.common.R;
 import com.fzz.reggie.dto.DishDto;
 import com.fzz.reggie.service.CategoryService;
-import com.fzz.reggie.service.DishFlavorService;
 import com.fzz.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -16,9 +14,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +24,6 @@ public class DishController {
 
     @Autowired
     private DishService dishService;
-
-    @Autowired
-    private DishFlavorService dishFlavorService;
 
     @Autowired
     private CategoryService categoryService;
@@ -63,8 +55,8 @@ public class DishController {
     }
 
     @DeleteMapping
-    public R<String> remove(String[] ids){
-        dishService.removeByIds(Arrays.asList(ids));
+    public R<String> remove(Long[] ids){
+        dishService.removeWithFlavor(ids);
         return R.success("批量删除成功");
     }
 
@@ -76,14 +68,7 @@ public class DishController {
 
     @PutMapping
     public R<String> update(@RequestBody DishDto dishDto){
-        Dish dish=new Dish();
-        BeanUtils.copyProperties(dishDto,dish,"flavors");
-        dishService.updateById(dish);
-        List<DishFlavor> flavors = dishDto.getFlavors();
-        for(DishFlavor flavor:flavors){
-            flavor.setDishId(dishDto.getId());
-        }
-        dishFlavorService.saveOrUpdateBatch(flavors);
+        dishService.updateWithFlavor(dishDto);
         return R.success("修改菜品成功");
     }
 
@@ -94,9 +79,9 @@ public class DishController {
     }
 
     @PostMapping("/status/{status}")
-    public R<Dish> updateStatus(@PathVariable String status,Long ids){
-        Dish dish=dishService.updateStatus(ids);
-        return R.success(dish);
+    public R<List<Dish>> updateStatus(@PathVariable String status,Long[] ids){
+        List<Dish> list=dishService.updateStatus(ids);
+        return R.success(list);
     }
 
 
