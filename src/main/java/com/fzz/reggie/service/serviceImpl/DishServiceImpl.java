@@ -33,13 +33,12 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
-    public List<Dish> updateStatus(Long[] ids) {
+    public List<Dish> updateStatus(Integer status,Long[] ids) {
         List<Dish> list = this.listByIds(Arrays.asList(ids));
         for(Dish dish:list){
-            dish.setStatus(dish.getStatus()==0?1:0);
+            dish.setStatus(status);
             this.updateById(dish);
         }
-
         return list;
     }
 
@@ -79,6 +78,16 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }
         this.removeByIds(list);
     }
+
+    @Override
+    public List<Dish> listByCategoryId(Long categoryId) {
+        LambdaQueryWrapper<Dish> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(Dish::getCategoryId,categoryId);
+        List<Dish> list = this.list(queryWrapper);
+        return list;
+    }
+
+
 
 
 }

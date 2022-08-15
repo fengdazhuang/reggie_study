@@ -8,13 +8,16 @@ import java.util.List;
 
 
 public interface DishService extends IService<Dish> {
+
     void saveWithFlavor(DishDto dishDto);
 
-    List<Dish> updateStatus(Long[] ids);
+    List<Dish> updateStatus(Integer status,Long[] ids);
 
     DishDto getWithFlavorById(Long id);
 
     void updateWithFlavor(DishDto dishDto);
 
     void removeWithFlavor(Long[] ids);
+
+    List<Dish> listByCategoryId(Long categoryId);
 }

@@ -79,9 +79,16 @@ public class DishController {
     }
 
     @PostMapping("/status/{status}")
-    public R<List<Dish>> updateStatus(@PathVariable String status,Long[] ids){
-        List<Dish> list=dishService.updateStatus(ids);
+    public R<List<Dish>> updateStatus(@PathVariable Integer status,Long[] ids){
+        List<Dish> list=dishService.updateStatus(status,ids);
         return R.success(list);
+    }
+
+    @GetMapping("/list")
+    public R<List<Dish>> list(Long categoryId){
+        List<Dish> dish=dishService.listByCategoryId(categoryId);
+
+        return R.success(dish);
     }
 
 
