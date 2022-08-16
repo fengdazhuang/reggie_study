@@ -8,9 +8,7 @@ import com.fzz.reggie.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +30,21 @@ public class OrderController {
         queryWrapper.orderByDesc(Order::getCheckoutTime);
         orderService.page(orderPage,queryWrapper);
         return R.success(orderPage);
+    }
+
+    @GetMapping("/userPage")
+    public R<Page> page(int page, int pageSize){
+        Page<Order> orderPage=new Page<>(page,pageSize);
+        LambdaQueryWrapper<Order> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.orderByDesc(Order::getCheckoutTime);
+        orderService.page(orderPage,queryWrapper);
+        return R.success(orderPage);
+    }
+
+    @PostMapping("/again")
+    public R<Order> againOrder(@RequestBody Long id){
+        Order order = orderService.getById(id);
+        return R.success(order);
     }
 
 }

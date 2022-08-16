@@ -59,14 +59,8 @@ public class SetmealController {
 
     @PostMapping
     public R<String> save(@RequestBody SetmealDto setmealDto){
-        Setmeal setmeal=new Setmeal();
-        BeanUtils.copyProperties(setmealDto,setmeal,"setmealDishes");
-        setmealService.save(setmeal);
-        List<SetmealDish> dishes = setmealDto.getSetmealDishes();
-        for(SetmealDish setmealDish:dishes){
-            setmealDish.setSetmealId(setmeal.getId());
-            setmealDishService.save(setmealDish);
-        }
+        setmealService.saveWithDish(setmealDto);
+
         return R.success("新增套餐成功");
     }
 
@@ -92,6 +86,13 @@ public class SetmealController {
     public R<String> removeWithDish(Long[] ids){
         setmealService.removeWithDish(ids);
         return R.success("删除套餐成功");
+    }
+
+    @GetMapping("/list")
+    public R<List<Setmeal>> list(Long categoryId){
+        List<Setmeal> list=setmealService.listByCategoryId(categoryId);
+
+        return R.success(list);
     }
 
 }

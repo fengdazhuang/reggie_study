@@ -59,12 +59,33 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     @Override
     public void removeWithDish(Long[] ids) {
         List<Long> longList = Arrays.asList(ids);
-        for(Long id:longList){
-            LambdaQueryWrapper<SetmealDish> queryWrapper=new LambdaQueryWrapper<>();
-            queryWrapper.eq(SetmealDish::getSetmealId,id);
-            setmealDishService.remove(queryWrapper);
-        }
+
+        LambdaQueryWrapper<SetmealDish> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.in(SetmealDish::getSetmealId,ids);
+        setmealDishService.remove(queryWrapper);
+
 
         this.removeByIds(longList);
     }
+
+    @Override
+    public void saveWithDish(SetmealDto setmealDto) {
+        this.save(setmealDto);
+        List<SetmealDish> dishes = setmealDto.getSetmealDishes();
+        for(SetmealDish setmealDish:dishes){
+            setmealDish.setSetmealId(setmealDto.getId());
+            setmealDishService.save(setmealDish);
+        }
+    }
+
+    @Override
+    public List<Setmeal> listByCategoryId(Long categoryId) {
+        LambdaQueryWrapper<Setmeal> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(Setmeal::getCategoryId,categoryId);
+        queryWrapper.eq(Setmeal::getStatus,1);
+        List<Setmeal> list = this.list(queryWrapper);
+        return list;
+    }
+
+
 }

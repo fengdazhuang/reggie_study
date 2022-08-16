@@ -71,11 +71,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     @Override
     public void removeWithFlavor(Long[] ids) {
         List<Long> list = Arrays.asList(ids);
-        for(Long id:list){
-            LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
-            queryWrapper.eq(DishFlavor::getDishId,id);
-            dishFlavorService.remove(queryWrapper);
-        }
+        LambdaQueryWrapper<DishFlavor> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.in(DishFlavor::getDishId,ids);
+        dishFlavorService.remove(queryWrapper);
         this.removeByIds(list);
     }
 
@@ -83,6 +81,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     public List<Dish> listByCategoryId(Long categoryId) {
         LambdaQueryWrapper<Dish> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(Dish::getCategoryId,categoryId);
+        queryWrapper.eq(Dish::getStatus,1);
         List<Dish> list = this.list(queryWrapper);
         return list;
     }

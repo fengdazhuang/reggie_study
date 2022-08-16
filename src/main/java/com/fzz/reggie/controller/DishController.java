@@ -86,6 +86,7 @@ public class DishController {
 
     @GetMapping("/list")
     public R<List<Dish>> list(Long categoryId){
+
         List<Dish> dish=dishService.listByCategoryId(categoryId);
 
         return R.success(dish);

@@ -30,7 +30,7 @@ public class LoginCheckFilter implements Filter {
         log.info("已拦截路径："+requestURI);
 
         String[] urls=new String[]{
-            "/employee/login","/employee/logout","/backend/**","/front/**"
+            "/employee/login","/employee/logout","/backend/**","/front/**","/user/login","/user/sendMsg"
         };
 
         if(check(urls,requestURI)){
@@ -40,6 +40,13 @@ public class LoginCheckFilter implements Filter {
 
         if(request.getSession().getAttribute("employee")!=null){
             Long id= (Long) request.getSession().getAttribute("employee");
+            BaseContext.setCurrent(id);
+            filterChain.doFilter(request,response);
+            return;
+        }
+
+        if(request.getSession().getAttribute("user")!=null){
+            Long id= (Long) request.getSession().getAttribute("user");
             BaseContext.setCurrent(id);
             filterChain.doFilter(request,response);
             return;
