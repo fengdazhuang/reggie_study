@@ -79,10 +79,12 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
     }
 
     @Override
-    public List<Setmeal> listByCategoryId(Long categoryId) {
+    public List<Setmeal> list(Setmeal setmeal) {
+        Long categoryId = setmeal.getCategoryId();
         LambdaQueryWrapper<Setmeal> queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.eq(Setmeal::getCategoryId,categoryId);
+        queryWrapper.eq(setmeal.getCategoryId()!=null,Setmeal::getCategoryId,categoryId);
         queryWrapper.eq(Setmeal::getStatus,1);
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
         List<Setmeal> list = this.list(queryWrapper);
         return list;
     }

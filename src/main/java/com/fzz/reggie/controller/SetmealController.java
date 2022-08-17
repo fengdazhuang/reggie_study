@@ -3,11 +3,13 @@ package com.fzz.reggie.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fzz.reggie.bean.Category;
+import com.fzz.reggie.bean.Dish;
 import com.fzz.reggie.bean.Setmeal;
 import com.fzz.reggie.bean.SetmealDish;
 import com.fzz.reggie.common.R;
 import com.fzz.reggie.dto.SetmealDto;
 import com.fzz.reggie.service.CategoryService;
+import com.fzz.reggie.service.DishService;
 import com.fzz.reggie.service.SetmealDishService;
 import com.fzz.reggie.service.SetmealService;
 import org.apache.commons.lang.StringUtils;
@@ -29,6 +31,8 @@ public class SetmealController {
 
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private DishService dishService;
 
 
     @GetMapping("/page")
@@ -89,10 +93,17 @@ public class SetmealController {
     }
 
     @GetMapping("/list")
-    public R<List<Setmeal>> list(Long categoryId){
-        List<Setmeal> list=setmealService.listByCategoryId(categoryId);
+    public R<List<Setmeal>> list(Setmeal setmeal){
+        List<Setmeal> list=setmealService.list(setmeal);
 
         return R.success(list);
     }
+
+    @GetMapping("/dish/{id}")
+    public R<Dish> dish(@PathVariable Long id){
+        Dish dish = dishService.getById(id);
+        return R.success(dish);
+    }
+
 
 }

@@ -22,6 +22,6 @@ public class ShoppingCart implements Serializable {
     private Integer number;
     private BigDecimal amount;
 
-    @TableField(fill= FieldFill.INSERT)
     private LocalDateTime createTime;
+
 }

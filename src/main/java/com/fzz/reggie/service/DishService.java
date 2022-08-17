@@ -19,5 +19,5 @@ public interface DishService extends IService<Dish> {
 
     void removeWithFlavor(Long[] ids);
 
-    List<Dish> listByCategoryId(Long categoryId);
+    List<DishDto> list(Dish dish);
 }

@@ -85,11 +85,11 @@ public class DishController {
     }
 
     @GetMapping("/list")
-    public R<List<Dish>> list(Long categoryId){
+    public R<List<DishDto>> list(Dish dish){
 
-        List<Dish> dish=dishService.listByCategoryId(categoryId);
+        List<DishDto> dishDtoList=dishService.list(dish);
 
-        return R.success(dish);
+        return R.success(dishDtoList);
     }
 
 

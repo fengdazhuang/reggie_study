@@ -17,5 +17,5 @@ public interface SetmealService extends IService<Setmeal> {
 
     void saveWithDish(SetmealDto setmealDto);
 
-    List<Setmeal> listByCategoryId(Long categoryId);
+    List<Setmeal> list(Setmeal setmeal);
 }
