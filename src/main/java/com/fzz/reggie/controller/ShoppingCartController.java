@@ -23,16 +23,19 @@ public class ShoppingCartController {
     public R<List<ShoppingCart>> list(){
         LambdaQueryWrapper<ShoppingCart> queryWrapper=new LambdaQueryWrapper<>();
         queryWrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrent());
+        queryWrapper.orderByDesc(ShoppingCart::getCreateTime);
         List<ShoppingCart> list = shoppingCartService.list(queryWrapper);
         return R.success(list);
+
     }
 
     @PostMapping("/add")
     public R<ShoppingCart> addToCart(@RequestBody ShoppingCart shoppingCart){
-        shoppingCart.setUserId(BaseContext.getCurrent());
+        Long currentId = BaseContext.getCurrent();
+        shoppingCart.setUserId(currentId);
         Long dishId = shoppingCart.getDishId();
         LambdaQueryWrapper<ShoppingCart> queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrent());
+        queryWrapper.eq(ShoppingCart::getUserId, currentId);
         if(dishId!=null){
             queryWrapper.eq(ShoppingCart::getDishId,dishId);
         } else {
@@ -45,10 +48,10 @@ public class ShoppingCartController {
             cart.setNumber(cart.getNumber()+1);
             shoppingCartService.updateById(cart);
         } else {
-            cart=shoppingCart;
-            cart.setCreateTime(LocalDateTime.now());
-            cart.setNumber(1);
+            shoppingCart.setCreateTime(LocalDateTime.now());
+            shoppingCart.setNumber(1);
             shoppingCartService.save(shoppingCart);
+            cart=shoppingCart;
         }
         return R.success(cart);
     }
@@ -56,23 +59,46 @@ public class ShoppingCartController {
     @PostMapping("/sub")
     public R<ShoppingCart> sub(@RequestBody ShoppingCart shoppingCart){
         LambdaQueryWrapper<ShoppingCart> queryWrapper=new LambdaQueryWrapper<>();
-        Long id = shoppingCart.getDishId();
-        if(id!=null){
-            queryWrapper.eq(ShoppingCart::getDishId,id);
-        } else {
-            queryWrapper.eq(ShoppingCart::getSetmealId,shoppingCart.getSetmealId());
+        Long dishId = shoppingCart.getDishId();
+        Long setmealId = shoppingCart.getSetmealId();
+        queryWrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrent());
+        if(dishId!=null){
+            queryWrapper.eq(ShoppingCart::getDishId,dishId);
+            ShoppingCart shoppingCart1 = shoppingCartService.getOne(queryWrapper);
+            shoppingCart1.setNumber(shoppingCart1.getNumber()-1);
+            Integer latestNumber = shoppingCart1.getNumber();
+            if(latestNumber>0){
+                shoppingCartService.updateById(shoppingCart1);
+            }else if(latestNumber==0){
+                shoppingCartService.removeById(shoppingCart1.getId());
+            }else if(latestNumber<0){
+                return R.error("操作异常");
+            }
+            return R.success(shoppingCart1);
         }
 
-        ShoppingCart cart = shoppingCartService.getOne(queryWrapper);
-        Integer number = cart.getNumber();
-        if(number>1){
-            cart.setNumber(number -1);
-            shoppingCartService.updateById(cart);
-        } else {
-            cart=shoppingCart;
-            cart.setNumber(0);
-            shoppingCartService.removeById(cart.getId());
+        if(setmealId!=null) {
+            queryWrapper.eq(ShoppingCart::getSetmealId, setmealId);
+            ShoppingCart shoppingCart2 = shoppingCartService.getOne(queryWrapper);
+            shoppingCart2.setNumber(shoppingCart2.getNumber()-1);
+            Integer latestNumber = shoppingCart2.getNumber();
+            if(latestNumber>0){
+                shoppingCartService.updateById(shoppingCart2);
+            }else if(latestNumber==0){
+                shoppingCartService.removeById(shoppingCart2.getId());
+            }else if(latestNumber<0){
+                return R.error("操作异常");
+            }
+            return R.success(shoppingCart2);
         }
-        return R.success(cart);
+
+        return R.error("操作异常");
+    }
+
+    @DeleteMapping("/clean")
+    public R<String> clean(){
+        shoppingCartService.clean();
+
+        return R.success("清空购物车成功");
     }
 }

@@ -5,4 +5,5 @@ import com.fzz.reggie.bean.Order;
 
 
 public interface OrderService extends IService<Order> {
+    void submit(Order order);
 }
