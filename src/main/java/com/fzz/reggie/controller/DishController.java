@@ -1,5 +1,6 @@
 package com.fzz.reggie.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fzz.reggie.bean.Category;
@@ -95,13 +96,24 @@ public class DishController {
     public R<List<DishDto>> list(Dish dish){
         List<DishDto> dishDtoList=null;
         String key="dish_"+dish.getCategoryId()+"_"+dish.getStatus();
-        dishDtoList= (List<DishDto>) redisTemplate.opsForValue().get(key);
+        //2.从redis获取数据，转为String类型
+        String resultSting = (String) redisTemplate.opsForValue().get(key);
+        //3.把json转换为List<DishDto>类型
+        dishDtoList= JSON.parseArray(resultSting,DishDto.class);
+        //4.如果redis中数据不为空，则直接返回
         if(dishDtoList!=null){
+            log.info("从redis获取数据成功");
             return R.success(dishDtoList);
         }
+        //5.如果redis中无数据，查询数据库
         dishDtoList=dishService.list(dish);
-        redisTemplate.opsForValue().set(key,dishDtoList,60, TimeUnit.MINUTES);
+        //6.将查询得到的数据转为String
+        String result = JSON.toJSONString(dishDtoList);
+        //7.保存到redis中
+        redisTemplate.opsForValue().set(key,result,60, TimeUnit.MINUTES);
+        //8.返回数据
         return R.success(dishDtoList);
+
     }
 
 

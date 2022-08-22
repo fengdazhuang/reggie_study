@@ -5,16 +5,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fzz.reggie.bean.Category;
 import com.fzz.reggie.bean.Dish;
 import com.fzz.reggie.bean.Setmeal;
-import com.fzz.reggie.bean.SetmealDish;
 import com.fzz.reggie.common.R;
 import com.fzz.reggie.dto.SetmealDto;
 import com.fzz.reggie.service.CategoryService;
 import com.fzz.reggie.service.DishService;
-import com.fzz.reggie.service.SetmealDishService;
 import com.fzz.reggie.service.SetmealService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,9 +25,6 @@ import java.util.stream.Collectors;
 public class SetmealController {
     @Autowired
     private SetmealService setmealService;
-
-    @Autowired
-    private SetmealDishService setmealDishService;
 
     @Autowired
     private CategoryService categoryService;
@@ -62,6 +59,7 @@ public class SetmealController {
     }
 
     @PostMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> save(@RequestBody SetmealDto setmealDto){
         setmealService.saveWithDish(setmealDto);
 
@@ -81,18 +79,21 @@ public class SetmealController {
     }
 
     @PutMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> updateWithDishes(@RequestBody SetmealDto setmealDto){
         setmealService.updateWithDishes(setmealDto);
         return R.success("修改状态成功");
     }
 
     @DeleteMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> removeWithDish(Long[] ids){
         setmealService.removeWithDish(ids);
         return R.success("删除套餐成功");
     }
 
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache",key = "#setmeal.categoryId+'_'+#setmeal.status")
     public R<List<Setmeal>> list(Setmeal setmeal){
         List<Setmeal> list=setmealService.list(setmeal);
 
